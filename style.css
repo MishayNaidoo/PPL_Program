@@ -15,28 +15,18 @@ body {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 480px; /* mobile-friendly width */
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
   animation: fadeIn 0.4s ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* ====== Headings ====== */
 h1 {
   text-align: center;
   color: #ffffff;
-  margin-bottom: 30px;
-  font-size: 28px;
+  margin-bottom: 24px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
   text-shadow: 0 2px 10px rgba(0,0,0,0.15);
@@ -46,39 +36,37 @@ p {
   text-align: center;
   color: rgba(255,255,255,0.9);
   font-size: 16px;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
-/* ====== Card Container ====== */
+/* ====== Cards (Weeks & Days) ====== */
 ul, #dayContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
   padding: 0;
   margin: 20px 0;
   list-style: none;
 }
 
-/* ====== Week & Day Cards ====== */
 ul li a,
 .dayCard {
   display: block;
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
   padding: 20px 24px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 16px;
   color: #1a1a1a;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 17px;
-  border-radius: 16px;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
   position: relative;
   overflow: hidden;
+  background: #ffffff; /* keep buttons/cards white on index.html */
 }
 
 ul li a::before,
@@ -96,8 +84,8 @@ ul li a::before,
 
 ul li a:hover,
 .dayCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.08);
 }
 
 ul li a:hover::before,
@@ -105,16 +93,7 @@ ul li a:hover::before,
   transform: scaleX(1);
 }
 
-ul li a:active,
-.dayCard:active {
-  transform: translateY(-2px);
-}
-
-/* Day cards - accent color */
-.dayCard {
-  background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
-}
-
+/* Day card accent */
 .dayCard::before {
   background: linear-gradient(90deg, #f093fb, #f5576c);
 }
@@ -122,37 +101,29 @@ ul li a:active,
 /* ====== Buttons ====== */
 .button,
 .backButton {
-  display: inline-block;
-  margin: 8px 6px;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.95);
+  display: block;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 16px 20px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  background: #ffffff; /* keep white on index.html */
   color: #667eea;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  letter-spacing: 0.3px;
 }
 
 .button:hover,
 .backButton:hover {
-  background: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.button:active,
-.backButton:active {
-  transform: translateY(0);
+  background: #f0f0f0;
 }
 
 .backButton {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2); /* optional translucent back button */
   color: white;
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.3);
 }
 
@@ -164,71 +135,30 @@ ul li a:active,
 #saveButton {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  font-size: 16px;
-  padding: 14px 32px;
+  font-size: 18px;
+  padding: 16px 32px;
+  width: 100%;
   margin-top: 20px;
-  display: block;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#saveButton:hover {
-  background: linear-gradient(135deg, #764ba2, #667eea);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-}
-
-/* ====== Auth Status ====== */
-#authStatus {
-  margin-top: 10px;
-  color: rgba(255,255,255,0.95);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  display: inline-block;
 }
 
 /* ====== Workout Table ====== */
 table {
   width: 100%;
+  display: block;
+  overflow-x: auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.98);
+  -webkit-overflow-scrolling: touch;
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 20px;
-  display: block;
-  overflow-x: auto;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  backdrop-filter: blur(10px);
-}
-
-/* Custom scrollbar for table */
-table::-webkit-scrollbar {
-  height: 8px;
-}
-
-table::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.05);
-  border-radius: 0 0 16px 16px;
-}
-
-table::-webkit-scrollbar-thumb {
-  background: #667eea;
-  border-radius: 10px;
-}
-
-table::-webkit-scrollbar-thumb:hover {
-  background: #764ba2;
 }
 
 th, td {
   border: 1px solid rgba(0,0,0,0.06);
-  padding: 14px 16px;
-  text-align: left;
-  font-size: 14px;
+  padding: 16px 20px;
+  font-size: 16px;
   white-space: nowrap;
 }
 
@@ -239,29 +169,8 @@ th {
   top: 0;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.5px;
-  z-index: 10;
-}
-
-th:first-child {
-  border-radius: 16px 0 0 0;
-}
-
-th:last-child {
-  border-radius: 0 16px 0 0;
-}
-
-tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-tbody tr:nth-child(even) {
-  background-color: rgba(102, 126, 234, 0.02);
-}
-
-tbody tr:hover {
-  background-color: rgba(102, 126, 234, 0.08);
 }
 
 td[contenteditable="true"]:focus {
@@ -270,86 +179,11 @@ td[contenteditable="true"]:focus {
   background: rgba(102, 126, 234, 0.05);
 }
 
-/* ====== Responsive Design ====== */
-@media (max-width: 768px) {
-  body {
-    padding: 0;
-  }
-
-  .container {
-    padding: 16px;
-  }
-
-  h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-
-  ul li a,
-  .dayCard {
-    max-width: 100%;
-    font-size: 16px;
-    padding: 18px 20px;
-  }
-
-  .button,
-  .backButton {
-    font-size: 14px;
-    padding: 10px 20px;
-  }
-
-  th, td {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  th {
-    font-size: 11px;
-  }
-}
-
+/* ====== Responsive adjustments ====== */
 @media (max-width: 480px) {
-  h1 {
-    font-size: 22px;
-  }
-
-  ul li a,
-  .dayCard {
-    padding: 16px 18px;
-    font-size: 15px;
-  }
-
-  table {
-    font-size: 12px;
-    border-radius: 12px;
-  }
-
-  th, td {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-
-  .button,
-  .backButton {
-    width: auto;
-    min-width: 120px;
-  }
-
-  #saveButton {
-    width: 100%;
-  }
-}
-
-/* ====== Loading Animation ====== */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.loading {
-  animation: pulse 1.5s ease-in-out infinite;
+  .container { max-width: 100%; padding: 12px; }
+  h1 { font-size: 24px; }
+  ul li a, .dayCard { font-size: 17px; padding: 18px 20px; }
+  th, td { font-size: 15px; padding: 14px 16px; }
+  #saveButton, .button, .backButton { font-size: 17px; padding: 16px 18px; }
 }
