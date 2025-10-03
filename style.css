@@ -1,145 +1,355 @@
 /* ====== Global Styles ====== */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f4f4f9;
-  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #1a1a1a;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .container {
   max-width: 900px;
-  margin: auto;
+  margin: 0 auto;
   padding: 20px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 h1 {
   text-align: center;
-  color: #2c3e50;
+  color: #ffffff;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+p {
+  text-align: center;
+  color: rgba(255,255,255,0.9);
+  font-size: 16px;
   margin-bottom: 30px;
 }
 
-/* ====== Vertical Button Cards (Weeks & Days) ====== */
+/* ====== Card Container ====== */
 ul, #dayContainer {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
   align-items: center;
   padding: 0;
-  margin: 0;
+  margin: 20px 0;
   list-style: none;
 }
 
+/* ====== Week & Day Cards ====== */
 ul li a,
 .dayCard {
   display: block;
-  width: 200px; /* fixed width for cleaner layout */
-  padding: 18px 20px;
-  background: linear-gradient(135deg, #6c5ce7, #a29bfe); /* purple gradient for week */
-  color: white;
+  width: 100%;
+  max-width: 320px;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  color: #1a1a1a;
   text-decoration: none;
   font-weight: 600;
-  font-size: 16px;
-  border-radius: 10px;
+  font-size: 17px;
+  border-radius: 16px;
   text-align: center;
-  transition: background 0.3s, transform 0.2s;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+ul li a::before,
+.dayCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
 ul li a:hover,
 .dayCard:hover {
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1);
+}
+
+ul li a:hover::before,
+.dayCard:hover::before {
+  transform: scaleX(1);
+}
+
+ul li a:active,
+.dayCard:active {
   transform: translateY(-2px);
 }
 
-/* Day cards - slightly different gradient for distinction */
+/* Day cards - accent color */
 .dayCard {
-  background: linear-gradient(135deg, #00b894, #55efc4); /* green-teal */
+  background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
 }
 
-.dayCard:hover {
-  background: linear-gradient(135deg, #55efc4, #00b894);
+.dayCard::before {
+  background: linear-gradient(90deg, #f093fb, #f5576c);
+}
+
+/* ====== Buttons ====== */
+.button,
+.backButton {
+  display: inline-block;
+  margin: 8px 6px;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #667eea;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  letter-spacing: 0.3px;
+}
+
+.button:hover,
+.backButton:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.button:active,
+.backButton:active {
+  transform: translateY(0);
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255,255,255,0.5);
+}
+
+#saveButton {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-size: 16px;
+  padding: 14px 32px;
+  margin-top: 20px;
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#saveButton:hover {
+  background: linear-gradient(135deg, #764ba2, #667eea);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* ====== Auth Status ====== */
+#authStatus {
+  margin-top: 10px;
+  color: rgba(255,255,255,0.95);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  display: inline-block;
 }
 
 /* ====== Workout Table ====== */
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 20px;
   display: block;
   overflow-x: auto;
-  white-space: nowrap;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  backdrop-filter: blur(10px);
+}
+
+/* Custom scrollbar for table */
+table::-webkit-scrollbar {
+  height: 8px;
+}
+
+table::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 0 0 16px 16px;
+}
+
+table::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+table::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
 }
 
 th, td {
-  border: 1px solid #e0e0e0;
-  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 14px 16px;
   text-align: left;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 th {
-  background-color: #2c3e50;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   position: sticky;
   top: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  z-index: 10;
+}
+
+th:first-child {
+  border-radius: 16px 0 0 0;
+}
+
+th:last-child {
+  border-radius: 0 16px 0 0;
+}
+
+tbody tr {
+  transition: background-color 0.2s ease;
 }
 
 tbody tr:nth-child(even) {
-  background-color: #f7f7f7;
+  background-color: rgba(102, 126, 234, 0.02);
 }
 
 tbody tr:hover {
-  background-color: #e0f7fa;
+  background-color: rgba(102, 126, 234, 0.08);
+}
+
+td[contenteditable="true"]:focus {
+  outline: 2px solid #667eea;
+  outline-offset: -2px;
+  background: rgba(102, 126, 234, 0.05);
 }
 
 /* ====== Responsive Design ====== */
 @media (max-width: 768px) {
   body {
-    padding: 10px;
+    padding: 0;
+  }
+
+  .container {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
   }
 
   ul li a,
   .dayCard {
-    width: 180px;
+    max-width: 100%;
+    font-size: 16px;
+    padding: 18px 20px;
+  }
+
+  .button,
+  .backButton {
     font-size: 14px;
-    padding: 15px 18px;
+    padding: 10px 20px;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  th {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  ul li a,
+  .dayCard {
+    padding: 16px 18px;
+    font-size: 15px;
+  }
+
+  table {
+    font-size: 12px;
+    border-radius: 12px;
   }
 
   th, td {
     padding: 8px 10px;
     font-size: 12px;
   }
-}
 
-@media (max-width: 480px) {
-  ul li a,
-  .dayCard {
+  .button,
+  .backButton {
+    width: auto;
+    min-width: 120px;
+  }
+
+  #saveButton {
     width: 100%;
   }
+}
 
-  table {
-    font-size: 11px;
+/* ====== Loading Animation ====== */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }
 
-.backButton {
-  display: inline-block;
-  margin-bottom: 20px;
-  padding: 10px 18px;
-  background-color: #bdc3c7;
-  color: #2c3e50;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-}
-
-.backButton:hover {
-  background-color: #95a5a6;
-  transform: translateY(-2px);
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
 }
