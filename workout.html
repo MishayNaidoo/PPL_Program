@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Workout Editor</title>
+<style>
+body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f4f4f9; color: #333; margin:0; padding:0; }
+.container { max-width: 900px; margin:auto; padding:20px; }
+h1 { text-align:center; color:#2c3e50; margin-bottom:20px; }
+.button { display:inline-block; margin-bottom:15px; padding:10px 18px; background:#bdc3c7; color:#2c3e50; border:none; border-radius:8px; font-weight:bold; cursor:pointer; transition:0.2s; }
+.button:hover { background:#95a5a6; transform:translateY(-2px); }
+table { width:100%; border-collapse:collapse; margin-top:20px; display:block; overflow-x:auto; white-space:nowrap; background:#fff; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.05); }
+th, td { border:1px solid #e0e0e0; padding:10px 12px; text-align:left; font-size:14px; }
+th { background:#2c3e50; color:white; position:sticky; top:0; }
+tbody tr:nth-child(even) { background:#f7f7f7; }
+tbody tr:hover { background:#e0f7fa; }
+@media(max-width:768px){ body{padding:10px} th,td{padding:8px 10px;font-size:12px} .button{font-size:14px;padding:8px 12px} }
+@media(max-width:480px){ table{font-size:11px} .button{width:100%;text-align:center} }
+</style>
+</head>
+<body>
+<div class="container">
+  <button class="button" onclick="history.back()">← Back to Days</button>
+  <h1 id="weekTitle">Workout Editor</h1>
+
+  <button class="button" id="authorize_button">Sign in with Google</button>
+  <button class="button" id="signout_button" style="display:none;">Sign Out</button>
+
+  <table id="workoutTable">
+    <thead>
+      <tr>
+        <th>Exercise</th>
+        <th>Last Set Intensity Technique</th>
+        <th>Warm-Up Sets</th>
+        <th>Working Sets</th>
+        <th>Reps</th>
+        <th>Set 1</th>
+        <th>Set 2</th>
+        <th>Set 3</th>
+        <th>Set 4</th>
+        <th>Early Set RPE</th>
+        <th>Last Set RPE</th>
+        <th>Rest</th>
+        <th>Substitution Option 1</th>
+        <th>Substitution Option 2</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button class="button" id="saveButton">💾 Save Changes</button>
+</div>
+
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const CLIENT_ID = '560891972293-oto0nvvk7s5sjsl46edjrefk2tnil16p.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyBAJJJy5vAYssuSgwCzzE-2UBjCQDbsflA';
+const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+const SPREADSHEET_ID = '1fhO6DkJriUWq8vPjqNx3huiFO_OPxmiu-pSIvoiJEDM';
+
+const authorizeButton = document.getElementById('authorize_button');
+const signoutButton = document.getElementById('signout_button');
+const saveButton = document.getElementById('saveButton');
+
+let accessToken = null;
+let tokenExpiryTime = null;
+
+const urlParams = new URLSearchParams(window.location.search);
+const currentWeek = urlParams.get('week') || 'Week1';
+const currentDay = urlParams.get('day') || 'Pull #1';
+
+document.getElementById('weekTitle').textContent = `Workout - ${currentWeek} - ${currentDay}`;
+
+const dayRanges = {
+  "Pull #1": "B5:P10","Push #1": "B11:P16","Legs #1": "B18:P22","Arms and Weak Points #1": "B23:P29",
+  "Pull #2": "B34:P39","Push #2": "B40:P45","Legs #2": "B47:P52","Arms and Weak Points #2": "B53:P59"
+};
+
+// ===== Token Persistence Functions =====
+function saveTokenToStorage(token, expiresIn) {
+  const expiryTime = Date.now() + (expiresIn * 1000);
+  localStorage.setItem('google_access_token', token);
+  localStorage.setItem('token_expiry', expiryTime.toString());
+}
+
+function loadTokenFromStorage() {
+  const token = localStorage.getItem('google_access_token');
+  const expiry = localStorage.getItem('token_expiry');
+  
+  if (token && expiry) {
+    const expiryTime = parseInt(expiry);
+    if (Date.now() < expiryTime) {
+      return token;
+    } else {
+      // Token expired, clear it
+      clearTokenFromStorage();
+    }
+  }
+  return null;
+}
+
+function clearTokenFromStorage() {
+  localStorage.removeItem('google_access_token');
+  localStorage.removeItem('token_expiry');
+}
+
+// ===== OAuth =====
+function handleClientLoad() {
+  gapi.load('client', initClient);
+}
+
+function initClient() {
+  gapi.client.init({
+    apiKey: API_KEY,
+    discoveryDocs: DISCOVERY_DOCS
+  }).then(() => {
+    // Check for stored token on page load
+    const storedToken = loadTokenFromStorage();
+    if (storedToken) {
+      accessToken = storedToken;
+      authorizeButton.style.display='none';
+      signoutButton.style.display='inline-block';
+      loadSheetData(currentWeek, currentDay);
+    }
+
+    authorizeButton.onclick = requestAccessToken;
+    signoutButton.onclick = () => {
+      accessToken = null;
+      clearTokenFromStorage();
+      authorizeButton.style.display='inline-block';
+      signoutButton.style.display='none';
+      alert('Signed out successfully');
+    };
+  });
+}
+
+function requestAccessToken() {
+  google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (tokenResponse) => {
+      accessToken = tokenResponse.access_token;
+      // Store token with expiry (default is 3600 seconds if not provided)
+      const expiresIn = tokenResponse.expires_in || 3600;
+      saveTokenToStorage(accessToken, expiresIn);
+      
+      authorizeButton.style.display='none';
+      signoutButton.style.display='inline-block';
+      loadSheetData(currentWeek, currentDay);
+    }
+  }).requestAccessToken();
+}
+
+// ===== Load Sheet Data =====
+async function loadSheetData(week,day){
+  if(!accessToken) return;
+  gapi.client.setToken({access_token: accessToken});
+  const RANGE = dayRanges[day];
+  if(!RANGE) return;
+
+  try{
+    const response = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range:`${week}!${RANGE}`
+    });
+    populateTable(response.result.values);
+  }catch(err){
+    console.error(err);
+    // If error is due to invalid token, clear storage and prompt re-login
+    if(err.status === 401) {
+      clearTokenFromStorage();
+      accessToken = null;
+      authorizeButton.style.display='inline-block';
+      signoutButton.style.display='none';
+      alert('Session expired. Please sign in again.');
+    }
+  }
+}
+
+// ===== Populate Table =====
+function populateTable(values){
+  const tbody = document.querySelector("#workoutTable tbody");
+  tbody.innerHTML = '';
+  if(!values || values.length===0){tbody.innerHTML="<tr><td colspan='15'>No data found</td></tr>"; return;}
+  values.forEach((row,rowIndex)=>{
+    const tr=document.createElement('tr');
+    row.forEach((cell,colIndex)=>{
+      const td=document.createElement('td');
+      td.textContent=cell||'';
+      td.contentEditable="true";
+      td.dataset.row=rowIndex;
+      td.dataset.col=colIndex;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== Save Table =====
+saveButton.onclick=async()=>{
+  if(!accessToken) return alert("Please sign in first");
+  gapi.client.setToken({access_token: accessToken});
+  const tbody=document.querySelector("#workoutTable tbody");
+  const updatedValues=[];
+  tbody.querySelectorAll("tr").forEach(tr=>{
+    const row=[];
+    tr.querySelectorAll("td").forEach(td=>row.push(td.textContent));
+    updatedValues.push(row);
+  });
+  const RANGE = dayRanges[currentDay];
+  try{
+    await gapi.client.sheets.spreadsheets.values.update({
+      spreadsheetId:SPREADSHEET_ID,
+      range:`${currentWeek}!${RANGE}`,
+      valueInputOption:"USER_ENTERED",
+      resource:{values:updatedValues}
+    });
+    alert("Sheet updated successfully!");
+  }catch(err){
+    console.error(err);
+    if(err.status === 401) {
+      clearTokenFromStorage();
+      accessToken = null;
+      authorizeButton.style.display='inline-block';
+      signoutButton.style.display='none';
+      alert('Session expired. Please sign in again.');
+    }
+  }
+}
+
+handleClientLoad();
+</script>
+</body>
+</html>

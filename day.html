@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Select Workout</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="backButton" onclick="history.back()">Back</button>
+   
+    <h1 id="weekTitle">Select a Workout</h1>
+    
+    <div style="text-align: center; margin: 20px 0;">
+      <button class="button" id="authorize_button" style="display:none;">Sign in with Google</button>
+      <button class="button" id="signout_button" style="display:none;">Sign Out</button>
+      <div id="authStatus" style="margin-top: 10px; color: #2c3e50;"></div>
+    </div>
+    
+    <div id="dayContainer"></div>
+    
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+    const SPREADSHEET_ID = "1fhO6DkJriUWq8vPjqNx3huiFO_OPxmiu-pSIvoiJEDM";
+    const API_KEY = "AIzaSyBAJJJy5vAYssuSgwCzzE-2UBjCQDbsflA";
+    const CLIENT_ID = '560891972293-oto0nvvk7s5sjsl46edjrefk2tnil16p.apps.googleusercontent.com';
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+    
+    const authorizeButton = document.getElementById('authorize_button');
+    const signoutButton = document.getElementById('signout_button');
+    const authStatus = document.getElementById('authStatus');
+    
+    let accessToken = null;
+    
+    // ===== Token Persistence Functions =====
+    function saveTokenToStorage(token, expiresIn) {
+      const expiryTime = Date.now() + (expiresIn * 1000);
+      localStorage.setItem('google_access_token', token);
+      localStorage.setItem('token_expiry', expiryTime.toString());
+    }
+
+    function loadTokenFromStorage() {
+      const token = localStorage.getItem('google_access_token');
+      const expiry = localStorage.getItem('token_expiry');
+      
+      if (token && expiry) {
+        const expiryTime = parseInt(expiry);
+        if (Date.now() < expiryTime) {
+          return token;
+        } else {
+          // Token expired, clear it
+          clearTokenFromStorage();
+        }
+      }
+      return null;
+    }
+
+    function clearTokenFromStorage() {
+      localStorage.removeItem('google_access_token');
+      localStorage.removeItem('token_expiry');
+    }
+    
+    // ===== OAuth Setup =====
+    function handleClientLoad() {
+      gapi.load('client', initClient);
+    }
+
+    function initClient() {
+      gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+      }).then(() => {
+        // Check for stored token on page load
+        const storedToken = loadTokenFromStorage();
+        if (storedToken) {
+          accessToken = storedToken;
+          authorizeButton.style.display='none';
+          signoutButton.style.display='inline-block';
+          authStatus.textContent = '✓ Signed in to Google';
+          authStatus.style.color = '#27ae60';
+        } else {
+          authorizeButton.style.display='inline-block';
+          signoutButton.style.display='none';
+          authStatus.textContent = 'Sign in to access your workouts';
+          authStatus.style.color = '#e74c3c';
+        }
+
+        authorizeButton.onclick = requestAccessToken;
+        signoutButton.onclick = () => {
+          accessToken = null;
+          clearTokenFromStorage();
+          authorizeButton.style.display='inline-block';
+          signoutButton.style.display='none';
+          authStatus.textContent = 'Signed out';
+          authStatus.style.color = '#95a5a6';
+        };
+      });
+    }
+
+    function requestAccessToken() {
+      google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: (tokenResponse) => {
+          accessToken = tokenResponse.access_token;
+          const expiresIn = tokenResponse.expires_in || 3600;
+          saveTokenToStorage(accessToken, expiresIn);
+          
+          authorizeButton.style.display='none';
+          signoutButton.style.display='inline-block';
+          authStatus.textContent = '✓ Signed in to Google';
+          authStatus.style.color = '#27ae60';
+        }
+      }).requestAccessToken();
+    }
+    
+    // ===== Original Page Logic =====
+    function getQueryParam(param) {
+      return new URLSearchParams(window.location.search).get(param);
+    }
+    
+    const week = getQueryParam("week") || "Week1";
+    document.getElementById("weekTitle").textContent = `Week: ${week}`;
+    
+    // Row-based day ranges
+    const dayRanges = {
+      "Pull #1": "B5:P10",
+      "Push #1": "B11:P16",
+      "Legs #1": "B18:P22",
+      "Arms and Weak Points #1": "B23:P29",
+      "Pull #2": "B34:P39",
+      "Push #2": "B40:P45",
+      "Legs #2": "B47:P52",
+      "Arms and Weak Points #2": "B53:P59"
+    };
+    
+    const container = document.getElementById("dayContainer");
+    
+    // Create clickable cards for each day
+    Object.keys(dayRanges).forEach(day => {
+      const button = document.createElement("a");
+      button.textContent = day;
+      button.href = `workout.html?week=${week}&day=${encodeURIComponent(day)}`;
+      button.className = "dayCard";
+      container.appendChild(button);
+    });
+    
+    // Initialize Google API
+    handleClientLoad();
+    </script>
+</body>
+</html>

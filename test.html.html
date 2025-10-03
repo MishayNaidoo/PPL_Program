@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Workout Tracker</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <h1>First Week Workout</h1>
+  <table id="workoutTable">
+    <thead>
+      <tr>
+        <th>Exercise</th>
+        <th>Last Set Intensity Technique</th>
+        <th>Warm-Up Sets</th>
+        <th>Working Sets</th>
+        <th>Reps</th>
+        <th>Set 1</th>
+        <th>Set 2</th>
+        <th>Set 3</th>
+        <th>Set 4</th>
+        <th>Early Set RPE</th>
+        <th>Last Set RPE</th>
+        <th>Rest</th>
+        <th>Substitution Option 1</th>
+        <th>Substitution Option 2</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const SPREADSHEET_ID = "1fhO6DkJriUWq8vPjqNx3huiFO_OPxmiu-pSIvoiJEDM";
+    const RANGE = "Week1!B5:P5"; // first row of exercises in Week1
+    const API_KEY = "AIzaSyBAJJJy5vAYssuSgwCzzE-2UBjCQDbsflA"; // replace with your API key
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#workoutTable tbody");
+        if (data.values && data.values.length > 0) {
+          const tr = document.createElement("tr");
+          data.values[0].forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        } else {
+          tbody.innerHTML = "<tr><td colspan='4'>No data found</td></tr>";
+        }
+      })
+      .catch(err => console.error("Error fetching sheet:", err));
+  </script>
+</body>
+</html>
