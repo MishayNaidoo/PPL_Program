@@ -5,6 +5,10 @@
 <title>Workout Editor</title>
 <link rel="stylesheet" href="style.css">
 </head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a1a1a">
 <body>
 <div class="container">
   <button class="button backButton" onclick="history.back()">← Back to Days</button>
@@ -175,7 +179,7 @@ function populateTable(values) {
       const td=document.createElement('td');
       td.textContent=cell||'';
       td.contentEditable="true";
-      td.inputMode="decimal";
+      //td.inputMode="decimal";
       td.dataset.row=rowIndex;
       td.dataset.col=colIndex;
       tr.appendChild(td);
