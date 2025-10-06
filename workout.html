@@ -175,7 +175,7 @@ function populateTable(values) {
       const td=document.createElement('td');
       td.textContent=cell||'';
       td.contentEditable="true";
-      td.inputMode="numeric";
+      td.inputMode="decimal";
       td.dataset.row=rowIndex;
       td.dataset.col=colIndex;
       tr.appendChild(td);
